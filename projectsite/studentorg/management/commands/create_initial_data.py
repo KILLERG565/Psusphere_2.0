@@ -21,11 +21,14 @@ class Command(BaseCommand):
             )
         self.stdout.write(self.style.SUCCESS('Organizations created.'))
 
-    def create_students(self, count):
-        fake = Faker('en_PH')
+    def create_students(self, count):         # ← same level as create_organization
+        fake = Faker('en_PH')                 # ← indented inside method
+        if not Program.objects.exists():
+            self.stdout.write(self.style.ERROR('No programs found. Add programs first.'))
+            return
         for _ in range(count):
             Student.objects.create(
-                student_id=f"{fake.random_int(2020,2025)}-{fake.random_int(1,8)}-{fake.random_number(digits=4)}",
+                student_id=f"{fake.random_int(2020,2025)}-{fake.random_int(1,8)}-{str(fake.random_number(digits=4)).zfill(4)}",
                 lastname=fake.last_name(),
                 firstname=fake.first_name(),
                 middlename=fake.last_name(),
@@ -33,8 +36,11 @@ class Command(BaseCommand):
             )
         self.stdout.write(self.style.SUCCESS('Students created.'))
 
-    def create_membership(self, count):
-        fake = Faker()
+    def create_membership(self, count):       # ← same level as create_organization
+        fake = Faker()                        # ← indented inside method
+        if not Student.objects.exists() or not Organization.objects.exists():
+            self.stdout.write(self.style.ERROR('No students or organizations found.'))
+            return
         for _ in range(count):
             OrgMember.objects.create(
                 student=Student.objects.order_by('?').first(),
